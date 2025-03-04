@@ -88,8 +88,17 @@ public class ProfileUploadRetrieval extends AssignmentEndpoint {
     }
     try {
       var id = request.getParameter("id");
+      if (!isValidId(id)) {
+        return ResponseEntity.badRequest()
+            .body("Invalid ID parameter");
+      }
       var catPicture =
           new File(catPicturesDirectory, (id == null ? RandomUtils.nextInt(1, 11) : id) + ".jpg");
+
+      if (!catPicture.getCanonicalPath().startsWith(catPicturesDirectory.getCanonicalPath())) {
+        return ResponseEntity.badRequest()
+            .body("Invalid file path");
+      }
 
       if (catPicture.getName().toLowerCase().contains("path-traversal-secret.jpg")) {
         return ResponseEntity.ok()
@@ -102,6 +111,16 @@ public class ProfileUploadRetrieval extends AssignmentEndpoint {
             .location(new URI("/PathTraversal/random-picture?id=" + catPicture.getName()))
             .body(Base64.getEncoder().encode(FileCopyUtils.copyToByteArray(catPicture)));
       }
+    } catch (IOException | URISyntaxException e) {
+      log.error("Error retrieving profile picture", e);
+    }
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+  }
+
+  private boolean isValidId(String id) {
+    return id != null && id.matches("^[a-zA-Z0-9]+$");
+  }
+}
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .location(new URI("/PathTraversal/random-picture?id=" + catPicture.getName()))
           .body(
