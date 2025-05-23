@@ -1,5 +1,5 @@
 function getCookieValue() {
-	var cookie = document.cookie.match(new RegExp('(^| )spoof_auth=([^;]+)'));
+	var cookie = new RegExp('(^| )spoof_auth=([^;]+)').exec(document.cookie);
 	if (cookie != null)
 		return [2];
 	return null;
