@@ -26,6 +26,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.codec.Hex;
+import java.security.SecureRandom;
+import java.math.BigInteger;
 
 /***
  *
@@ -37,7 +39,7 @@ public class EncDec {
 
   // PoC: weak encoding method
 
-  private static final String SALT = RandomStringUtils.randomAlphabetic(10);
+  private static final String SALT = new BigInteger(130, new SecureRandom()).toString(32).substring(0, 10);
 
   private EncDec() {}
 
